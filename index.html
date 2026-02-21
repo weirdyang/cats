@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3exotics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #0a0a0a;
+  --fg: #e8e4df;
+  --muted: #5a5650;
+  --accent: #f4a261;
+  --grain-opacity: 0.035;
+  --col-gap: 6px;
+  --row-gap: 6px;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: 'DM Mono', monospace;
+  font-weight: 300;
+  overflow-x: hidden;
+  cursor: crosshair;
+}
+
+/* ── Film grain overlay ── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: var(--grain-opacity);
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-size: 128px;
+}
+
+/* ── Scroll progress bar ── */
+#progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 2px;
+  width: 0%;
+  background: var(--accent);
+  z-index: 10000;
+  transition: width 0.1s linear;
+}
+
+/* ── Header ── */
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  padding: 24px 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  mix-blend-mode: difference;
+  pointer-events: none;
+}
+
+.logo {
+  font-family: 'Instrument Serif', serif;
+  font-size: 1.6rem;
+  font-style: italic;
+  letter-spacing: -0.02em;
+  pointer-events: auto;
+  user-select: none;
+}
+
+.logo span { color: var(--accent); }
+
+.counter {
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-align: right;
+  line-height: 1.6;
+  pointer-events: auto;
+}
+
+.counter strong {
+  display: block;
+  font-size: 2.4rem;
+  font-family: 'Instrument Serif', serif;
+  font-weight: 400;
+  color: var(--fg);
+  letter-spacing: -0.03em;
+  line-height: 1;
+  margin-bottom: 2px;
+}
+
+/* ── Hero ── */
+.hero {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 0 32px 64px;
+  position: relative;
+}
+
+.hero-title {
+  font-family: 'Instrument Serif', serif;
+  font-size: clamp(4rem, 12vw, 10rem);
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+  margin-bottom: 16px;
+  opacity: 0;
+  animation: fadeUp 1s ease-out 0.3s forwards;
+}
+
+.hero-title em {
+  font-style: italic;
+  color: var(--accent);
+}
+
+.hero-sub {
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+  max-width: 400px;
+  line-height: 1.8;
+  opacity: 0;
+  animation: fadeUp 1s ease-out 0.6s forwards;
+}
+
+.scroll-hint {
+  position: absolute;
+  right: 32px;
+  bottom: 48px;
+  writing-mode: vertical-rl;
+  font-size: 0.65rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--muted);
+  opacity: 0;
+  animation: fadeUp 1s ease-out 0.9s forwards;
+}
+
+.ig-link {
+  display: inline-block;
+  margin-top: 24px;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+  text-decoration: none;
+  border: 1px solid var(--accent);
+  padding: 10px 20px;
+  transition: all 0.3s ease;
+  opacity: 0;
+  animation: fadeUp 1s ease-out 0.8s forwards;
+}
+
+.ig-link:hover {
+  background: var(--accent);
+  color: var(--bg);
+}
+
+.scroll-hint::after {
+  content: '';
+  display: block;
+  width: 1px;
+  height: 48px;
+  background: var(--muted);
+  margin-top: 12px;
+  margin-left: auto;
+  margin-right: auto;
+  animation: scrollPulse 2s ease-in-out infinite;
+}
+
+/* ── Gallery controls ── */
+.controls {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  padding: 80px 32px 20px;
+  background: linear-gradient(to bottom, var(--bg) 60%, transparent);
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.controls button {
+  background: none;
+  border: 1px solid var(--muted);
+  color: var(--fg);
+  font-family: 'DM Mono', monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-radius: 0;
+}
+
+.controls button:hover, .controls button.active {
+  background: var(--fg);
+  color: var(--bg);
+  border-color: var(--fg);
+}
+
+.controls .spacer { flex: 1; }
+
+.controls .view-toggle {
+  border-color: transparent;
+  opacity: 0.5;
+}
+.controls .view-toggle:hover, .controls .view-toggle.active {
+  opacity: 1;
+  background: transparent;
+  color: var(--accent);
+  border-color: transparent;
+}
+
+/* ── Masonry grid ── */
+.gallery {
+  padding: 0 32px 120px;
+  columns: 4;
+  column-gap: var(--col-gap);
+}
+
+.gallery.cols-2 { columns: 2; }
+.gallery.cols-3 { columns: 3; }
+.gallery.cols-5 { columns: 5; }
+
+.gallery-item {
+  break-inside: avoid;
+  margin-bottom: var(--row-gap);
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.gallery-item.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.gallery-item img {
+  width: 100%;
+  display: block;
+  filter: grayscale(0.15) contrast(1.05);
+  transition: filter 0.5s ease, transform 0.6s cubic-bezier(0.25, 0, 0, 1);
+}
+
+.gallery-item:hover img {
+  filter: grayscale(0) contrast(1.1) brightness(1.05);
+  transform: scale(1.03);
+}
+
+.gallery-item .overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(10,10,10,0.7) 0%, transparent 50%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  display: flex;
+  align-items: flex-end;
+  padding: 16px;
+}
+
+.gallery-item:hover .overlay { opacity: 1; }
+
+.overlay .index {
+  font-family: 'Instrument Serif', serif;
+  font-size: 2rem;
+  font-style: italic;
+  color: var(--accent);
+  line-height: 1;
+}
+
+.overlay .filename {
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  color: var(--muted);
+  margin-left: auto;
+  align-self: flex-end;
+}
+
+/* ── Lightbox ── */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 10001;
+  background: rgba(5, 5, 5, 0.96);
+  display: none;
+  place-items: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  cursor: zoom-out;
+}
+
+.lightbox.open {
+  display: grid;
+  opacity: 1;
+}
+
+.lightbox img {
+  max-width: 90vw;
+  max-height: 85vh;
+  object-fit: contain;
+  animation: lbIn 0.4s cubic-bezier(0.25, 0, 0, 1);
+}
+
+.lightbox .lb-info {
+  position: fixed;
+  bottom: 24px;
+  left: 32px;
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+.lightbox .lb-nav {
+  position: fixed;
+  bottom: 24px;
+  right: 32px;
+  display: flex;
+  gap: 16px;
+}
+
+.lightbox .lb-nav button {
+  background: none;
+  border: 1px solid var(--muted);
+  color: var(--fg);
+  width: 40px;
+  height: 40px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'DM Mono', monospace;
+}
+.lightbox .lb-nav button:hover {
+  background: var(--fg);
+  color: var(--bg);
+}
+
+.lightbox .lb-close {
+  position: fixed;
+  top: 24px;
+  right: 32px;
+  background: none;
+  border: none;
+  color: var(--fg);
+  font-size: 1.5rem;
+  cursor: pointer;
+  font-family: 'DM Mono', monospace;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+.lightbox .lb-close:hover { opacity: 1; }
+
+/* ── Footer ── */
+footer {
+  padding: 48px 32px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+footer a {
+  color: var(--accent);
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+footer a:hover { opacity: 0.7; }
+
+/* ── Animations ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scrollPulse {
+  0%, 100% { opacity: 0.4; height: 48px; }
+  50% { opacity: 1; height: 64px; }
+}
+
+@keyframes lbIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* ── Back to top ── */
+.back-top {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: var(--fg);
+  color: var(--bg);
+  border: none;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 10px 20px;
+  cursor: pointer;
+  z-index: 90;
+  transition: transform 0.4s cubic-bezier(0.25, 0, 0, 1), opacity 0.3s;
+  opacity: 0;
+}
+.back-top.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+
+/* ── Responsive ── */
+@media (max-width: 1024px) {
+  .gallery { columns: 3; }
+}
+
+@media (max-width: 768px) {
+  header { padding: 16px 20px; }
+  .hero { padding: 0 20px 36px; }
+  .hero-title { font-size: clamp(3rem, 14vw, 6rem); }
+  .controls { padding: 72px 20px 16px; }
+  .gallery { padding: 0 20px 80px; columns: 2; }
+  .scroll-hint { display: none; }
+  footer { padding: 32px 20px; flex-direction: column; gap: 8px; }
+}
+
+@media (max-width: 480px) {
+  .gallery { columns: 1; }
+}
+
+/* ── Loading placeholder ── */
+.gallery-item.placeholder {
+  background: rgba(255,255,255,0.03);
+  aspect-ratio: 3/4;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.6; }
+}
+</style>
+</head>
+<body>
+
+<div id="progress"></div>
+
+<header>
+  <div class="logo"><span>3</span>exotics</div>
+  <div class="counter">
+    <strong id="visibleCount">0</strong>
+    photographs loaded
+  </div>
+</header>
+
+<section class="hero">
+  <h1 class="hero-title">3<em>exotics</em></h1>
+  <p class="hero-sub">463 photographs of exotic longhairs. No filters. No algorithms. Just fluff.</p>
+  <a href="https://www.instagram.com/3exotics/" target="_blank" class="ig-link">@3exotics ↗</a>
+  <div class="scroll-hint">scroll</div>
+</section>
+
+<div class="controls">
+  <button class="active" data-sort="default">Default</button>
+  <button data-sort="shuffle">Shuffle</button>
+  <div class="spacer"></div>
+  <button class="view-toggle" data-cols="2">▐▌</button>
+  <button class="view-toggle active" data-cols="4">▐▐▌▌</button>
+  <button class="view-toggle" data-cols="5">▐▐▐▌▌</button>
+</div>
+
+<div class="gallery" id="gallery"></div>
+
+<button class="back-top" id="backTop">↑ Top</button>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox">
+  <button class="lb-close">×</button>
+  <img src="" alt="" id="lbImg">
+  <div class="lb-info" id="lbInfo"></div>
+  <div class="lb-nav">
+    <button id="lbPrev">←</button>
+    <button id="lbNext">→</button>
+  </div>
+</div>
+
+<footer>
+  <span>© 2025 — 3exotics</span>
+  <a href="https://www.instagram.com/3exotics/" target="_blank">instagram ↗</a>
+</footer>
+
+<script>
+// ═══════════════════════════════════════════════════════
+//  CONFIG — Update these paths to match your photo files
+// ═══════════════════════════════════════════════════════
+//
+//  Option A: If your photos are named sequentially like cat-001.webp:
+//    const PHOTOS = Array.from({length: 463}, (_, i) => `photos/cat-${String(i+1).padStart(3,'0')}.webp`);
+//
+//  Option B: If your photos have custom names, list them:
+//    const PHOTOS = ['photos/fluffy.jpg', 'photos/mittens.jpg', ...];
+//
+//  For this demo, we generate placeholder images:
+
+   const PHOTOS = Array.from({length: 463}, (_, i) => ({
+     src: `photos/cat-${String(i+1).padStart(3,'0')}.jpg`,
+     index: i + 1,
+     filename: `cat-${String(i+1).padStart(3,'0')}.jpg`
+   }));
+
+// ═══════════════════════════════════════════════════════
+
+const gallery = document.getElementById('gallery');
+const lightbox = document.getElementById('lightbox');
+const lbImg = document.getElementById('lbImg');
+const lbInfo = document.getElementById('lbInfo');
+const progress = document.getElementById('progress');
+const visibleCount = document.getElementById('visibleCount');
+const backTop = document.getElementById('backTop');
+
+let currentLb = 0;
+let loadedCount = 0;
+let currentPhotos = [...PHOTOS];
+
+// Scroll progress
+window.addEventListener('scroll', () => {
+  const scrolled = window.scrollY / (document.body.scrollHeight - window.innerHeight);
+  progress.style.width = `${Math.min(scrolled * 100, 100)}%`;
+  backTop.classList.toggle('show', window.scrollY > window.innerHeight);
+});
+
+backTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+// Intersection observer for reveal animations
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((entry, i) => {
+    if (entry.isIntersecting) {
+      setTimeout(() => entry.target.classList.add('visible'), i * 30);
+      observer.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.05, rootMargin: '50px' });
+
+// Render gallery — lazy loads in batches
+function renderGallery(photos = currentPhotos) {
+  gallery.innerHTML = '';
+  loadedCount = 0;
+
+  // Render first batch immediately, rest on scroll
+  const BATCH = 40;
+  let loaded = 0;
+
+  function loadBatch() {
+    const end = Math.min(loaded + BATCH, photos.length);
+    for (let i = loaded; i < end; i++) {
+      const item = document.createElement('div');
+      item.className = 'gallery-item';
+      item.dataset.idx = i;
+
+      const img = document.createElement('img');
+      img.loading = 'lazy';
+      img.alt = `Cat ${photos[i].index}`;
+      img.src = photos[i].src;
+
+      img.onload = () => {
+        loadedCount++;
+        visibleCount.textContent = loadedCount;
+      };
+
+      const overlay = document.createElement('div');
+      overlay.className = 'overlay';
+      overlay.innerHTML = `
+        <span class="index">${photos[i].index}</span>
+        <span class="filename">${photos[i].filename}</span>
+      `;
+
+      item.appendChild(img);
+      item.appendChild(overlay);
+      gallery.appendChild(item);
+      observer.observe(item);
+
+      item.addEventListener('click', () => openLightbox(i));
+    }
+    loaded = end;
+  }
+
+  loadBatch();
+
+  // Infinite-ish scroll to load more
+  const scrollLoader = new IntersectionObserver((entries) => {
+    if (entries[0].isIntersecting && loaded < photos.length) {
+      loadBatch();
+    }
+  }, { rootMargin: '600px' });
+
+  // Sentinel element
+  const sentinel = document.createElement('div');
+  sentinel.style.height = '1px';
+  gallery.after(sentinel);
+  scrollLoader.observe(sentinel);
+}
+
+// Lightbox
+function openLightbox(idx) {
+  currentLb = idx;
+  updateLightbox();
+  lightbox.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox() {
+  lightbox.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function updateLightbox() {
+  const photo = currentPhotos[currentLb];
+  lbImg.src = photo.src;
+  lbInfo.textContent = `${photo.filename}  —  ${currentLb + 1} / ${currentPhotos.length}`;
+}
+
+document.querySelector('.lb-close').addEventListener('click', closeLightbox);
+lightbox.addEventListener('click', (e) => { if (e.target === lightbox) closeLightbox(); });
+
+document.getElementById('lbPrev').addEventListener('click', (e) => {
+  e.stopPropagation();
+  currentLb = (currentLb - 1 + currentPhotos.length) % currentPhotos.length;
+  updateLightbox();
+});
+
+document.getElementById('lbNext').addEventListener('click', (e) => {
+  e.stopPropagation();
+  currentLb = (currentLb + 1) % currentPhotos.length;
+  updateLightbox();
+});
+
+// Keyboard nav
+document.addEventListener('keydown', (e) => {
+  if (!lightbox.classList.contains('open')) return;
+  if (e.key === 'Escape') closeLightbox();
+  if (e.key === 'ArrowLeft') { currentLb = (currentLb - 1 + currentPhotos.length) % currentPhotos.length; updateLightbox(); }
+  if (e.key === 'ArrowRight') { currentLb = (currentLb + 1) % currentPhotos.length; updateLightbox(); }
+});
+
+// Sort controls
+document.querySelectorAll('.controls button[data-sort]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.controls button[data-sort]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    if (btn.dataset.sort === 'shuffle') {
+      currentPhotos = [...PHOTOS].sort(() => Math.random() - 0.5);
+    } else {
+      currentPhotos = [...PHOTOS];
+    }
+    renderGallery(currentPhotos);
+  });
+});
+
+// Column toggles
+document.querySelectorAll('.view-toggle').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.view-toggle').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    gallery.className = 'gallery';
+    const cols = btn.dataset.cols;
+    if (cols !== '4') gallery.classList.add(`cols-${cols}`);
+  });
+});
+
+// Init
+renderGallery();
+
+// Animated counter on load
+let countAnim = 0;
+const countTarget = TOTAL;
+const countEl = document.querySelector('.counter strong');
+function animateCount() {
+  countAnim += Math.ceil((countTarget - countAnim) / 20);
+  if (countAnim >= countTarget) { countEl.textContent = countTarget; return; }
+  countEl.textContent = countAnim;
+  requestAnimationFrame(animateCount);
+}
+setTimeout(animateCount, 800);
+</script>
+
+</body>
+</html>
