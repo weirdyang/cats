@@ -95,6 +95,51 @@
     .lightbox-close { position:absolute; right:14px; top:14px; font-size:20px; border:0; }
     .nap-toast { position:fixed; right:20px; bottom:20px; z-index:5; background:var(--ink); color:var(--paper); padding:12px 16px; border-radius:99px; font:10px var(--mono); letter-spacing:.08em; opacity:0; transform:translateY(10px); pointer-events:none; transition:.25s; }
     .nap-toast.show { opacity:1; transform:translateY(0); }
+
+    /* Bolder court-room / sleepy-monster art direction */
+    :root { --paper:#f5edda; --paper-deep:#e4dcc5; --ink:#172c25; --muted:#68756a; --sage:#a8bd8c; --sage-dark:#234c3d; --butter:#e7bf58; }
+    body { background:var(--paper); }
+    .topline { height:9px; background:var(--butter); }
+    .site-header { background:#172c25; color:#f5edda; border:0; padding-top:20px; padding-bottom:20px; }
+    .wordmark b { color:var(--butter); }
+    .main-nav { display:flex; gap:clamp(12px,3vw,38px); }
+    .main-nav a { color:#e9e5d6; text-decoration:none; font:10px var(--mono); letter-spacing:.13em; }
+    .main-nav a:hover { color:var(--butter); }
+    .site-header .micro { color:#c3c9b8; }
+    .hero { max-width:none; min-height:690px; background:#b8c99b; padding-top:80px; padding-bottom:55px; grid-template-columns:minmax(0,.9fr) minmax(420px,1.1fr); gap:3vw; overflow:hidden; }
+    .hero .eyebrow { color:#315541; font-weight:500; }
+    h1 { font-size:clamp(82px,12vw,174px); line-height:.76; letter-spacing:-.075em; color:#172c25; }
+    h1 em { color:#f5edda; font-style:italic; }
+    .hero-copy { color:#344d3c; font-size:16px; max-width:390px; font-weight:500; }
+    .pill-link { background:#172c25; color:#f5edda; border-color:#172c25; }
+    .pill-link:hover { background:#e7bf58; color:#172c25; }
+    .nap-toggle { border-color:#172c25; color:#172c25; }
+    .hero-art { min-height:510px; }
+    .hero-photo { inset:5% 5% 5% 18%; border-radius:48% 48% 12px 12px; border:8px solid #f5edda; transform:rotate(3deg); }
+    .hero-photo img { filter:saturate(.95) contrast(1.02); }
+    .sleeping-giant { position:absolute; z-index:2; width:min(112%,690px); left:-8%; bottom:-8%; pointer-events:none; }
+    .sleeping-giant svg { width:100%; overflow:visible; filter:drop-shadow(0 18px 9px #172c2522); }
+    .photo-stamp { z-index:3; left:3%; bottom:3%; background:var(--butter); padding:17px 21px; transform:rotate(-7deg); }
+    .photo-stamp strong { font-size:31px; }
+    .court-seal { position:absolute; z-index:4; right:0; top:4%; width:112px; height:112px; border:2px solid #172c25; border-radius:50%; display:grid; place-content:center; text-align:center; font:9px/1.5 var(--mono); letter-spacing:.08em; transform:rotate(11deg); color:#172c25; background:#f5edda; }
+    .court-seal b { font-size:23px; line-height:1; }
+    .case-ribbon { margin-top:42px; padding-top:12px; border-top:1px solid #526b54; display:flex; flex-wrap:wrap; gap:9px 18px; color:#315541; font:8px var(--mono); letter-spacing:.1em; }
+    .case-ribbon b { color:#172c25; }
+    .archive-bar { border-color:#172c25; }
+    .archive-bar strong { font-size:clamp(22px,3vw,34px); color:#234c3d; }
+    .collection { padding-top:75px; }
+    h2 { font-size:clamp(48px,7vw,86px); }
+    .toolbar { border-color:#172c25; }
+    .tool-button.active { background:#172c25; color:#f5edda; border-color:#172c25; }
+    .photo-card { border-radius:0; background:#d8d0b9; }
+    .photo-card::after { background:linear-gradient(transparent,#172c25bb); }
+    .footer { background:#172c25; }
+    .nap-toast { border:1px solid var(--butter); border-radius:2px; }
+    body.nap-mode { --paper:#dce5cc; --paper-deep:#cbd8b8; --ink:#172c25; --muted:#526b54; --sage:#a8bd8c; --butter:#e7bf58; }
+    body.nap-mode .hero { background:#9eaf88; }
+    @media (max-width:900px) { .hero { grid-template-columns:1fr; } .hero-art { min-height:430px; width:min(100%,650px); margin:0 auto; } .main-nav { display:none; } }
+    @media (max-width:700px) { .hero { padding-top:65px; } .hero-art { min-height:340px; } .sleeping-giant { width:115%; left:-9%; } .case-ribbon { margin-top:28px; } }
+
     @media (max-width:1000px) { .gallery { columns:3; } .hero { gap:35px; } }
     @media (max-width:700px) {
       .site-header { padding:18px var(--gutter); } .header-note { display:none; }
@@ -114,54 +159,59 @@
   <div class="topline"></div>
   <header class="site-header">
     <a class="wordmark" href="#" aria-label="3exotics home"><b>3</b>exotics</a>
-    <div class="header-note">An independent archive of excellent fluff</div>
-    <div class="micro">EST. 2025&nbsp; / &nbsp;SINGAPORE</div>
+    <nav class="main-nav" aria-label="Main navigation">
+      <a href="#collection">THE RESIDENTS</a><a href="#collection">CASE FILES</a><a href="#nap-room">THE NAP ROOM</a>
+    </nav>
+    <div class="micro">PRIVATE COLLECTION&nbsp; / &nbsp;SINGAPORE</div>
   </header>
 
   <main>
     <section class="hero" aria-labelledby="hero-title">
       <div>
-        <p class="eyebrow">THE EXOTIC LONGHAIR ARCHIVE &nbsp;·&nbsp; VOL. 01</p>
-        <h1 id="hero-title">A softer<br>kind of <em>presence.</em></h1>
-        <p class="hero-copy">A growing collection of exceptionally fluffy faces, quiet moments and unapologetically important naps. Consider this your permission to pause.</p>
+        <p class="eyebrow">IN THE HIGH COURT OF CATS &nbsp;·&nbsp; EST. 2025</p>
+        <h1 id="hero-title">Objection.<br>Too <em>fluffy.</em></h1>
+        <p class="hero-copy">787 photographic exhibits. Several serious allegations of excessive softness. One very sleepy legal department. The court is now in session.</p>
         <div class="hero-actions">
-          <a class="pill-link" href="#collection">Explore the archive <span aria-hidden="true">↘</span></a>
-          <button class="nap-toggle" id="napToggle" type="button" aria-pressed="false">Enter nap mode <span aria-hidden="true">☾</span></button>
+          <a class="pill-link" href="#collection">Review the evidence <span aria-hidden="true">↘</span></a>
+          <button class="nap-toggle" id="napToggle" type="button" aria-pressed="false">Do not disturb <span aria-hidden="true">☾</span></button>
         </div>
+        <div class="case-ribbon"><span>CASE NO. 0001–0787</span><b>THE PEOPLE VS. BEDTIME</b><span>STATUS: PERMANENTLY ADJOURNED</span></div>
       </div>
-      <div class="hero-art" aria-label="Featured exotic longhair cat">
+      <div class="hero-art" aria-label="Illustration of a large sleepy, round cat">
         <div class="hero-photo"><img src="photos/cat-001.jpg" alt="Featured exotic longhair cat" fetchpriority="high"></div>
-        <div class="photo-stamp"><strong>Take it slow.</strong><span>Good things take naps</span></div>
-        <div class="mascot-card">
-          <svg class="mascot" viewBox="0 0 140 120" role="img" aria-label="A sleepy round cat mascot">
-            <ellipse cx="70" cy="105" rx="48" ry="7" fill="#26372b" opacity=".12"/>
-            <path d="M27 51 23 19q-1-9 8-3l25 20M113 51l4-32q1-9-8-3L84 38" fill="#89977c" stroke="#53634e" stroke-width="3" stroke-linejoin="round"/>
-            <path d="M18 75c0-29 21-49 52-49s52 20 52 49-20 35-52 35S18 104 18 75Z" fill="#aab59a" stroke="#53634e" stroke-width="3"/>
-            <path d="M43 68q8 8 16 0M81 68q8 8 16 0" fill="none" stroke="#354638" stroke-width="3" stroke-linecap="round"/>
-            <path d="m66 78 4 3 4-3" fill="none" stroke="#354638" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M70 81q-7 9-13 2M70 81q7 9 13 2" fill="none" stroke="#354638" stroke-width="2" stroke-linecap="round"/>
-            <ellipse cx="48" cy="89" rx="11" ry="6" fill="#d89e89" opacity=".55"/><ellipse cx="92" cy="89" rx="11" ry="6" fill="#d89e89" opacity=".55"/>
-            <path d="M34 100q-9 8-15 0M106 100q9 8 15 0" fill="none" stroke="#53634e" stroke-width="3" stroke-linecap="round"/>
-            <path d="M104 24q8-10 15-2" fill="none" stroke="#e8c978" stroke-width="3" stroke-linecap="round"/>
+        <div class="sleeping-giant" aria-hidden="true">
+          <svg viewBox="0 0 620 470" role="img">
+            <ellipse cx="312" cy="418" rx="242" ry="24" fill="#10251e" opacity=".18"/>
+            <path d="M120 292c-34-58-22-150 31-203 31-31 74-43 113-28 48-19 109-14 147 15 69 53 88 147 48 222-34 64-106 98-195 98-72 0-119-31-144-104Z" fill="#c9d7a9" stroke="#172c25" stroke-width="9"/>
+            <path d="M155 139 133 58q-7-26 18-16l80 59M420 104l58-62q19-19 25 8l-2 92" fill="#c9d7a9" stroke="#172c25" stroke-width="9" stroke-linejoin="round"/>
+            <path d="M183 231q23 24 48 0M355 231q23 24 48 0" fill="none" stroke="#172c25" stroke-width="10" stroke-linecap="round"/>
+            <path d="m284 257 18 12 18-12" fill="none" stroke="#172c25" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M302 269q-20 25-43 7M302 269q20 25 43 7" fill="none" stroke="#172c25" stroke-width="7" stroke-linecap="round"/>
+            <path d="M111 336q-45 35-76-5M506 344q45 31 75-10" fill="none" stroke="#172c25" stroke-width="13" stroke-linecap="round"/>
+            <path d="M195 355q-28 19-48-3M390 355q28 19 48-3" fill="none" stroke="#91a879" stroke-width="18" stroke-linecap="round"/>
+            <path d="M466 84q34-35 66-7" fill="none" stroke="#e4bd56" stroke-width="12" stroke-linecap="round"/>
+            <path d="M498 37l10-19M531 51l19-8" stroke="#e4bd56" stroke-width="8" stroke-linecap="round"/>
+            <text x="308" y="32" text-anchor="middle" font-family="monospace" font-size="16" letter-spacing="5" fill="#172c25">CHIEF NAP OFFICER</text>
           </svg>
-          <span class="mascot-caption">Chief nap officer</span>
         </div>
+        <div class="photo-stamp"><strong>Exhibit A.</strong><span>Excessive levels of fluff</span></div>
+        <div class="court-seal">CERTIFIED<br>VERY SLEEPY<br><b>✳</b></div>
       </div>
     </section>
 
     <div class="archive-bar">
-      <span class="micro">A STUDY IN SOFTNESS</span>
-      <strong>787 little reasons to stop scrolling.</strong>
-      <span class="micro">NO RUSH. NO RULES.</span>
+      <span class="micro">THE EVIDENCE ROOM</span>
+      <strong>787 exhibits. Not one remorseful face.</strong>
+      <span class="micro">FILED UNDER: TOO CUTE</span>
     </div>
 
     <section class="collection" id="collection" aria-labelledby="collection-title">
       <div class="collection-heading">
         <div>
-          <p class="eyebrow">THE COLLECTION &nbsp; / &nbsp; 001—787</p>
-          <h2 id="collection-title">The fluff files.</h2>
+          <p class="eyebrow">DISCOVERY PHASE &nbsp; / &nbsp; EXHIBITS 001—787</p>
+          <h2 id="collection-title">Meet the suspects.</h2>
         </div>
-        <p class="collection-description">An ongoing visual record of very serious subjects doing very unserious things. Select a photograph to take a closer look.</p>
+        <p class="collection-description">Every subject is presumed innocent of being this adorable. Tap an exhibit to inspect the evidence. No further questions.</p>
       </div>
       <div class="toolbar" aria-label="Gallery controls">
         <span class="toolbar-label">Arrange</span>
@@ -178,7 +228,7 @@
 
   <footer class="footer">
     <div class="footer-brand">3exotics</div>
-    <div class="footer-note">A small archive. A large amount of fluff.</div>
+    <div class="footer-note" id="nap-room">THE NAP ROOM IS ALWAYS OPEN. LEGAL COUNSEL IS ASLEEP.</div>
     <a href="https://www.instagram.com/3exotics/" target="_blank" rel="noopener noreferrer">@3exotics ↗</a>
   </footer>
 
