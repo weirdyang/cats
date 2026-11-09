@@ -71,7 +71,7 @@
     .photo-count { font:10px var(--mono); color:var(--muted); white-space:nowrap; }
     .gallery { columns:4; column-gap:14px; }
     .photo-card { display:block; width:100%; padding:0; margin:0 0 14px; border:0; background:var(--paper-deep); break-inside:avoid; position:relative; overflow:hidden; cursor:zoom-in; text-align:left; border-radius:3px; }
-    .photo-card img { display:block; width:100%; height:auto; min-height:130px; opacity:0; transition:opacity .35s, transform .6s cubic-bezier(.2,.7,.2,1); }
+    .photo-card img { display:block; width:100%; height:auto; opacity:0; transition:opacity .35s, transform .6s cubic-bezier(.2,.7,.2,1); }
     .photo-card img.loaded { opacity:1; }
     .photo-card:hover img { transform:scale(1.025); }
     .photo-card::after { content:""; position:absolute; inset:45% 0 0; background:linear-gradient(transparent,#17231c88); opacity:0; transition:opacity .25s; pointer-events:none; }
@@ -130,7 +130,11 @@
         </div>
       </div>
       <div class="hero-art" aria-label="Featured exotic longhair cat">
-        <div class="hero-photo"><img src="photos/cat-001.jpg" alt="Featured exotic longhair cat" fetchpriority="high"></div>
+        <div class="hero-photo"><img src="photos/800/cat-001.webp"
+               srcset="photos/400/cat-001.webp 400w, photos/800/cat-001.webp 800w"
+               sizes="(max-width:700px) 92vw, 42vw"
+               width="800" height="800"
+               alt="Featured exotic longhair cat" fetchpriority="high"></div>
         <div class="photo-stamp"><strong>Exhibit A.</strong><span>A compelling case for naps</span></div>
         <div class="mascot-card" aria-label="Chief Nap Officer seal">
           <span class="mascot-caption">Chief<br>Nap Officer</span>
@@ -187,9 +191,12 @@
   </dialog>
   <div class="nap-toast" id="napToast" role="status">The office is closed. Please enjoy your nap.</div>
 
+  <script src="photos/dims.js"></script>
   <script>
     "use strict";
-    const TOTAL = 787;
+    const PHOTO_DIMS = window.PHOTO_DIMS || [];
+    const TOTAL = PHOTO_DIMS.length || 787;
+    const GRID_SIZES = "(max-width:390px) 90vw, (max-width:700px) 45vw, (max-width:1000px) 30vw, 389px";
     const BATCH_SIZE = 36;
     const gallery = document.getElementById("gallery");
     const sentinel = document.getElementById("sentinel");
@@ -201,10 +208,18 @@
     const napToggle = document.getElementById("napToggle");
     const napToast = document.getElementById("napToast");
 
-    const photos = Array.from({ length: TOTAL }, (_, index) => ({
-      index: index + 1,
-      src: "photos/cat-" + String(index + 1).padStart(3, "0") + ".jpg"
-    }));
+    const photos = Array.from({ length: TOTAL }, (_, index) => {
+      const name = "cat-" + String(index + 1).padStart(3, "0");
+      const size = PHOTO_DIMS[index] || [400, 400];
+      return {
+        index: index + 1,
+        src: "photos/" + name + ".jpg",
+        thumb: "photos/400/" + name + ".webp",
+        thumb2x: "photos/800/" + name + ".webp",
+        width: size[0],
+        height: size[1]
+      };
+    });
     let currentPhotos = photos.slice();
     let rendered = 0;
     let currentLb = 0;
@@ -224,16 +239,27 @@
       button.dataset.position = String(position);
 
       const img = document.createElement("img");
-      img.src = photo.src;
+      img.src = photo.thumb;
+      img.srcset = photo.thumb + " 400w, " + photo.thumb2x + " 800w";
+      img.sizes = GRID_SIZES;
+      img.width = photo.width;
+      img.height = photo.height;
       img.alt = "Exotic longhair cat, photograph " + photo.index;
       img.loading = "lazy";
       img.decoding = "async";
       img.addEventListener("load", () => img.classList.add("loaded"), { once: true });
       img.addEventListener("error", () => {
+        if (img.dataset.fallback !== "1") {
+          img.dataset.fallback = "1";
+          img.removeAttribute("srcset");
+          img.removeAttribute("sizes");
+          img.src = photo.src;
+          return;
+        }
         button.classList.add("image-error");
         button.setAttribute("aria-label", "Photograph " + photo.index + " could not be loaded");
         img.alt = "Photograph unavailable";
-      }, { once: true });
+      });
 
       const meta = document.createElement("span");
       meta.className = "photo-meta";
